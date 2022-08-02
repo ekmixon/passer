@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """Passer learns, by watching network traffic, about the servers and clients on your network."""
+
 #Copyright 2008-2018, William Stearns <william.l.stearns@gmail.com>
 #Passer is a PASsive SERvice sniffer.
 #Home site http://www.stearns.org/passer/
@@ -91,11 +92,6 @@ else:
 
 
 botnet_warning_list = {}	#Dictionary of "IP,proto_port": ['warning1', 'warning2'] entries that say if you see that trio, that IP should get this/these warnings.
-				#If we see syn/ack coming back from tcp C&C's, tag the host as 'bot_candc' and the dest IP of the syn/ack as 'bot'
-				#For UDP, just use any data heading _to_ the CandC to tag both ends (source is 'bot', dest os 'bot_candc')
-				#FIXME - implement
-
-
 must_stop = False		#Set to true if exit requested by signal
 
 
@@ -523,11 +519,65 @@ layer_label_to_key = {'802.1Q': 'Dot1Q', '802.3': 'Dot3',
                       'cooked linux': 'CookedLinux'}
 #===============================================================================================
 
-phys_layers = set(['802.1Q', 'Ethernet', 'cooked linux'])
-addr_layers = set(['IP', 'IPv6', 'IPv6 Extension Header - Fragmentation header', 'IPv6 Extension Header - Hop-by-Hop Options Header'])
-task_layers = set(['BOOTP', 'Control message', 'DHCP options', 'DNS', 'GRE', 'HSRP', 'HSRP MD5 Authentication', 'ICMP', 'ICMPv6 Destination Unreachable', 'ICMPv6 Neighbor Discovery - Neighbor Solicitation', 'IP', 'IP in ICMP', 'ICMP in ICMP', 'ICMPv6 Packet Too Big', 'IPv6 in ICMPv6', 'ISAKMP', 'ISAKMP SA', 'NBNS query request', 'NBNS query response', 'NBT Datagram Packet', 'NTPHeader', 'Private (mode 7)', 'Radius', 'RIP header', 'RIP entry', 'Skinny', 'TCP', 'TCP in ICMP', 'TFTP opcode', 'TFTP Read Request', 'UDP', 'UDP in ICMP', 'SNMP', 'VRRP'])
-trailer_layers = set(['Raw', 'Padding'])
-special_layers = set(['802.1Q', '802.3', 'ARP', 'EAPOL', 'Ethernet', 'LLC', 'Padding', 'Raw', 'SNAP', 'Spanning Tree Protocol'])
+phys_layers = {'802.1Q', 'Ethernet', 'cooked linux'}
+addr_layers = {
+	'IP',
+	'IPv6',
+	'IPv6 Extension Header - Fragmentation header',
+	'IPv6 Extension Header - Hop-by-Hop Options Header',
+}
+
+task_layers = {
+	'BOOTP',
+	'Control message',
+	'DHCP options',
+	'DNS',
+	'GRE',
+	'HSRP',
+	'HSRP MD5 Authentication',
+	'ICMP',
+	'ICMPv6 Destination Unreachable',
+	'ICMPv6 Neighbor Discovery - Neighbor Solicitation',
+	'IP',
+	'IP in ICMP',
+	'ICMP in ICMP',
+	'ICMPv6 Packet Too Big',
+	'IPv6 in ICMPv6',
+	'ISAKMP',
+	'ISAKMP SA',
+	'NBNS query request',
+	'NBNS query response',
+	'NBT Datagram Packet',
+	'NTPHeader',
+	'Private (mode 7)',
+	'Radius',
+	'RIP header',
+	'RIP entry',
+	'Skinny',
+	'TCP',
+	'TCP in ICMP',
+	'TFTP opcode',
+	'TFTP Read Request',
+	'UDP',
+	'UDP in ICMP',
+	'SNMP',
+	'VRRP',
+}
+
+trailer_layers = {'Raw', 'Padding'}
+special_layers = {
+	'802.1Q',
+	'802.3',
+	'ARP',
+	'EAPOL',
+	'Ethernet',
+	'LLC',
+	'Padding',
+	'Raw',
+	'SNAP',
+	'Spanning Tree Protocol',
+}
+
 
 meta = {}		#Empty dictionary - not used in this version of passer, but will be used in the next.  Fills the open space in the ShowPacket function call.
 
@@ -564,7 +614,7 @@ def layer_slice(layer_l):
 		unknown_l = layer_l
 	else:
 		#IP layer was found at layer_l[addr_i]
-		phys_l = layer_l[0:addr_i]
+		phys_l = layer_l[:addr_i]
 		addr_l = [layer_l[addr_i]]
 		task_l = layer_l[addr_i+1:]
 
@@ -576,7 +626,7 @@ def layer_slice(layer_l):
 		while task_l and task_l[-1] in trailer_layers:
 			#Move this junk layer to the beginning of trailer and strip from task_l.
 			trailer_l.insert(0, task_l[-1])
-			task_l = task_l[0:-1]
+			task_l = task_l[:-1]
 			split_ok = set(phys_l).issubset(phys_layers) and set(addr_l).issubset(addr_layers) and set(task_l).issubset(task_layers) and set(trailer_l).issubset(trailer_layers)
 
 	if split_ok:
@@ -611,7 +661,7 @@ def signal_handler(sig, frame):
 		must_stop = True
 		#sys.exit(1)
 	else:
-		sys.stderr.write("Unhandled signal type: " + str(sig) + "\n")
+		sys.stderr.write(f"Unhandled signal type: {str(sig)}" + "\n")
 
 
 def exit_now():
@@ -638,13 +688,22 @@ def generate_summary_lines():
 	dests = destinations
 
 	#These come first because they may add 'scan' to the suspicious characteristics list for one or more IPs, which will be printed by the next loop.
-
 #FIXME
-	if "ClosedUDPPortsReceived" in processpacket.__dict__:											#Cross-function variable
+	if "ClosedUDPPortsReceived" in processpacket.__dict__:									#Cross-function variable
 		for an_ip in sorted(processpacket.ClosedUDPPortsReceived):
 			if len(processpacket.ClosedUDPPortsReceived[an_ip]) >= min_closed_ports_for_scanner:
-				ReportId("IP", an_ip, "IP", "suspicious", 'Scanned ' + str(len(processpacket.ClosedUDPPortsReceived[an_ip])) + ' UDP closed ports.', (['scan', ]), prefs, dests)
-
+				ReportId(
+					"IP",
+					an_ip,
+					"IP",
+					"suspicious",
+					f'Scanned {len(processpacket.ClosedUDPPortsReceived[an_ip])} UDP closed ports.',
+					[
+						'scan',
+					],
+					prefs,
+					dests,
+				)
 #FIXME
 	#if "ClosedTCPPortsReceived" in processpacket.__dict__:											#Cross-function variable
 	#	for an_ip in sorted(processpacket.ClosedTCPPortsReceived):
@@ -702,7 +761,7 @@ def write_object(filename, generic_object):
 		with open(filename, "wb") as write_h:
 			write_h.write(generic_object.encode('utf-8'))
 	except:
-		sys.stderr.write("Problem writing " + filename + ", skipping.")
+		sys.stderr.write(f"Problem writing {filename}, skipping.")
 		raise
 
 	return

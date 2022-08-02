@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """Library of routines used by passer."""
+
 #Copyright 2018, William Stearns <william.l.stearns@gmail.com>
 
 #Passer is a PASsive SERvice sniffer.
@@ -76,15 +77,11 @@ PriUDPPortNames = {"88": "kerberos", "111": "sunrpc", "177": "xdmcp", "389": "ld
 ### IPv4/UDPv4/44818 rockwell-encap	http://literature.rockwellautomation.com/idc/groups/literature/documents/qr/comm-qr001_-en-e.pdf , https://ics-cert.us-cert.gov/advisories/ICSA-13-011-03
 SecUDPPortNames = {"7": "echo", "13": "daytime", "17": "qotd", "19": "chargen", "179": "bgp", "192": "osu-nms", "445": "microsoft-ds", "465": "igmpv3lite", "513": "who", "623": "asf-rmcp_or_ipmi", "808": "omirr", "1080": "udpsocks", "1099": "rmiregistry", "1500": "udp1500", "1604": "darkcomet_rat_winframe_icabrowser", "3128": "udpsquid", "3283": "arms", "3386": "udp3386", "4738": "udp4738", "4800": "udp4800", "5006": "udp5006", "5008": "udp5008", "5093": "sentienl-lm", "5094": "hart-ip", "5354": "mdnsresponder", "5632": "pcanywherestat", "6000": "udp6000", "6969": "acmsoda", "6970": "rtsp", "8000": "udp8000", "8123": "udp8123", "8301": "udp8301", "8302": "udp8302", "9050": "udp9050", "9600": "udp9600", "9987": "teamspeak3-voice", "16464": "udp16464", "17185": "vxworks-debug", "20000": "udp20000", "24223": "udp24223", "27960": "udp27960", "30718": "lantronix", "32015": "udp32015", "32764": "udp32764", "32770": "udp32770", "34436": "udp34436", "35950": "udp35950", "44818": "rockwell-encap", "46414": "udp46414", "47808": "bacnet", "50023": "udp50023", "51413": "transmission", "53007": "udp53007", "55020": "udp55020", "63520": "udp63520", "64211": "udp64211"}
 
-					#Some ports in PriUDPPortNames and SecUDPPortNames need warnings attached to them - list them and their warning here.
 udp_port_warnings = {'13': 'small', '17': 'small', '1194': 'tunnel', '1701': 'tunnel', '1723': 'tunnel', '4500': 'tunnel', '8080': 'tunnel'}
 
 udp_port_names = {"53": "dns", "5353": "mdns"}		#Always access this as     udp_port_names.get(port_number_string, "unknown_port_name")
 
-				#UDP ports banned by policy.  May wish to do the entire range from 0 to 21 inclusive.
-				#Perhaps add 161: snmp and solaris in.routed 520.
 PolicyViolationUDPPorts = {'7': 'echo', '9': 'discard', '11': "sysstat", '13': 'daytime', '17': "qotd", '19': 'chargen', '69': 'tftp'}
-				#TCP ports banned by policy.  May wish to do the entire range from 0 to 19 inclusive.
 PolicyViolationTCPPorts = {'7': 'echo', '9': 'discard', '11': "sysstat", '13': 'daytime', '17': "qotd", '19': 'chargen', '23': 'telnet', '79': 'finger', "512": "rexec", "513": "rlogin", "514": "rsh_rcp", "623": "bmc"}
 
 sip_altport = (
@@ -117,8 +114,8 @@ SIPToMatch = re.compile('To:[^<]*<sip:([a-zA-Z0-9_\.-]+)@([a-zA-Z0-9:_\.-]+)[;>]
 config_dir = os.path.expanduser('~/.passer/')
 cache_dir = os.path.expanduser('~/.cache/')
 
-suspicious_ips_file = config_dir + '/suspicious_ips.json'
-trusted_ips_file = config_dir + '/trusted_ips.json'
+suspicious_ips_file = f'{config_dir}/suspicious_ips.json'
+trusted_ips_file = f'{config_dir}/trusted_ips.json'
 
 #Following are the root nameservers
 default_trusted_ips = ['192.5.5.241', '192.33.4.12', '192.36.148.17', '192.58.128.30', '192.112.36.4', '192.203.230.10', '193.0.14.129', '198.41.0.4', '198.97.190.53', '199.7.83.42', '199.7.91.13', '199.9.14.201', '202.12.27.33', '2001:0dc3:0000:0000:0000:0000:0000:0035', '2001:07fd:0000:0000:0000:0000:0000:0001', '2001:07fe:0000:0000:0000:0000:0000:0053', '2001:0500:00a8:0000:0000:0000:0000:000e', '2001:0500:0001:0000:0000:0000:0000:0053', '2001:0500:002d:0000:0000:0000:0000:000d', '2001:0500:002f:0000:0000:0000:0000:000f', '2001:0500:0002:0000:0000:0000:0000:000c', '2001:0500:009f:0000:0000:0000:0000:0042', '2001:0500:0012:0000:0000:0000:0000:0d0d', '2001:0500:0200:0000:0000:0000:0000:000b', '2001:0503:0c27:0000:0000:0000:0002:0030', '2001:0503:ba3e:0000:0000:0000:0002:0030']
@@ -175,7 +172,7 @@ def force_string(raw_string):
 
 	retval = raw_string
 
-	if sys.version_info > (3, 0):		#Python 3
+	if sys.version_info > (3, 0):#Python 3
 		if isinstance(raw_string, bytes):
 			retval = raw_string.decode("utf-8", 'replace')
 		elif isinstance(raw_string, str):
@@ -186,8 +183,8 @@ def force_string(raw_string):
 			#print("huh:" + str(raw_string))
 			#quit()
 		else:
-			print(str(type(raw_string)))
-			print("huh:" + str(raw_string))
+			print(type(raw_string))
+			print(f"huh:{str(raw_string)}")
 			quit()
 			retval = str(raw_string)
 	else:
@@ -204,11 +201,8 @@ def extract_len_string(len_encoded_string):
 	extraction."""
 
 
-	ret_str = ''
-
 	str_len = ord(len_encoded_string[0])
-	if str_len > 0:
-		ret_str = str(len_encoded_string[1:str_len+1])
+	ret_str = str(len_encoded_string[1:str_len+1]) if str_len > 0 else ''
 	string_tail = len_encoded_string[str_len+1:]
 
 	return (ret_str, string_tail)
@@ -221,9 +215,7 @@ def mkdir_p(path):
 		try:
 			os.makedirs(path)
 		except OSError as exc:
-			if exc.errno == errno.EEXIST and os.path.isdir(path):
-				pass
-			else:
+			if exc.errno != errno.EEXIST or not os.path.isdir(path):
 				raise
 
 
@@ -234,7 +226,7 @@ def write_object(filename, generic_object):
 		with open(filename, "wb") as write_h:
 			write_h.write(generic_object.encode('utf-8'))
 	except:
-		sys.stderr.write("Problem writing " + filename + ", skipping.")
+		sys.stderr.write(f"Problem writing {filename}, skipping.")
 		raise
 
 	return
@@ -261,7 +253,11 @@ def open_bzip2_file_to_tmp_file(bzip2_filename):
 				tmp_h.write(data)
 		return tmp_path
 	except:
-		sys.stderr.write("While expanding bzip2 file, unable to write to " + str(tmp_path) + ', exiting.\n')
+		sys.stderr.write(
+			f"While expanding bzip2 file, unable to write to {str(tmp_path)}"
+			+ ', exiting.\n'
+		)
+
 		raise
 
 
@@ -275,7 +271,11 @@ def open_gzip_file_to_tmp_file(gzip_filename):
 				tmp_h.write(data)
 		return tmp_path
 	except:
-		sys.stderr.write("While expanding gzip file, unable to write to " + str(tmp_path) + ', exiting.\n')
+		sys.stderr.write(
+			f"While expanding gzip file, unable to write to {str(tmp_path)}"
+			+ ', exiting.\n'
+		)
+
 		raise
 
 
@@ -301,14 +301,14 @@ def ShowPacket(orig_packet, meta_dict, banner_string, quit_override_preference, 
 	if prefs['devel'] is not False:
 		if meta_dict:
 			debug_out(str(meta_dict), prefs, dests)
-		debug_out("======== " + str(banner_string), prefs, dests)
+		debug_out(f"======== {str(banner_string)}", prefs, dests)
 		try:
 			debug_out(str(orig_packet.show(dump=True)), prefs, dests)
 		except TypeError:					#On older versions of scapy (<= 2.2.0) TypeError: show() got an unexpected keyword argument 'dump'
 			debug_out(str(orig_packet.show()), prefs, dests)
 		ls(orig_packet)						#This one's still spitting to stdout, not sure how to redirect to stderr
 		debug_out(str(orig_packet.answers), prefs, dests)
-		debug_out("Packet type: " + str(type(orig_packet)), prefs, dests)
+		debug_out(f"Packet type: {str(type(orig_packet))}", prefs, dests)
 		if quit_override_preference and prefs['quit']:		#quit_override_preference is either KeepGoing == false or HonorQuit == True
 			quit()
 
@@ -331,19 +331,35 @@ def explode_ip(raw_addr, prefs, dests):
 		#else:
 		#	pass
 
-	full_ip_string = ''
 	ip_obj = None
 
-	if raw_addr_string and raw_addr_string.find('%') > -1:
+	if raw_addr_string and '%' in raw_addr_string:
 		raw_addr_string = raw_addr_string.split('%')[0]			#Discard any "%en0...." after the IP address
 
-	if raw_addr_string != '' and not raw_addr_string.endswith(('.256', '.257', '.258', '.259', '.260')):		#raw_addr_string.find('.256') == -1
+	if raw_addr_string != '' and not raw_addr_string.endswith(('.256', '.257', '.258', '.259', '.260')):#raw_addr_string.find('.256') == -1
 		try:
 			ip_obj = ipaddress.ip_address(raw_addr_string)
 		except ValueError:
 			#See if it's in 2.6.0.0.9.0.0.0.5.3.0.1.B.7.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1 or 260090005301B7000000000000000001 format
 			hex_string = raw_addr_string.replace('.', '')
-			colon_hex_string = hex_string[0:4] + ':' + hex_string[4:8] + ':' + hex_string[8:12] + ':' + hex_string[12:16] + ':' + hex_string[16:20] + ':' + hex_string[20:24] + ':' + hex_string[24:28] + ':' + hex_string[28:32]
+			colon_hex_string = (
+				hex_string[:4]
+				+ ':'
+				+ hex_string[4:8]
+				+ ':'
+				+ hex_string[8:12]
+				+ ':'
+				+ hex_string[12:16]
+				+ ':'
+				+ hex_string[16:20]
+				+ ':'
+				+ hex_string[20:24]
+				+ ':'
+				+ hex_string[24:28]
+				+ ':'
+				+ hex_string[28:32]
+			)
+
 			try:
 				ip_obj = ipaddress.ip_address(colon_hex_string)
 			except ValueError:
@@ -351,10 +367,7 @@ def explode_ip(raw_addr, prefs, dests):
 				#debug_out(raw_addr_string, prefs, dests)
 				pass
 
-	if ip_obj is not None:
-		full_ip_string = ip_obj.exploded
-
-	return full_ip_string
+	return ip_obj.exploded if ip_obj is not None else ''
 
 
 def isFQDN(Hostname, prefs, dests):
@@ -365,7 +378,10 @@ def isFQDN(Hostname, prefs, dests):
 		#debug_out("Hostname " + Hostname + " too short, ignoring.", prefs, dests)
 		return False
 	elif not Hostname.endswith('.'):
-		debug_out("Hostname " + Hostname + "doesn't end in '.', ignoring.", prefs, dests)
+		debug_out(
+			f"Hostname {Hostname}" + "doesn't end in '.', ignoring.", prefs, dests
+		)
+
 		return False
 	elif len(Hostname) >= 6 and Hostname.endswith(('.aaa.', '.abb.', '.abc.', '.aig.', '.art.', '.aws.', '.axa.', '.bar.', '.bet.', '.bid.', '.bio.', '.biz.', '.bot.', '.box.', '.bzh.', '.cab.', '.cat.', '.cbs.', '.ceo.', '.com.', '.dev.', '.dog.', '.eco.', '.edu.', '.eus.', '.fit.', '.frl.', '.fun.', '.fyi.', '.gal.', '.gdn.', '.gop.', '.gov.', '.hiv.', '.hot.', '.hkt.', '.ibm.', '.ink.', '.int.', '.ist.', '.jio.', '.jmp.', '.jnj.', '.jot.', '.kim.', '.krd.', '.law.', '.lds.', '.llc.', '.lol.', '.ltd.', '.men.', '.mil.', '.moe.', '.net.', '.ngo.', '.now.', '.nrw.', '.ntt.', '.nyc.', '.one.', '.ong.', '.onl.', '.org.', '.ovh.', '.pet.', '.pro.', '.pub.', '.pwc.', '.red.', '.rio.', '.rip.', '.run.', '.scb.', '.sex.', '.ski.', '.srl.', '.tel.', '.thd.', '.top.', '.uno.', '.uol.', '.vet.', '.vip.', '.win.', '.wow.', '.wtc.', '.wtf.', '.xin.', '.xxx.', '.xyz.', '.you.', '.aco.', '.ads.', '.aeg.', '.afl.', '.anz.', '.aol.', '.app.', '.bbc.', '.bbt.', '.bcg.', '.bcn.', '.bms.', '.bmw.', '.bnl.', '.bom.', '.boo.', '.buy.', '.cal.', '.cam.', '.car.', '.cba.', '.cbn.', '.ceb.', '.cfa.', '.cfd.', '.crs.', '.csc.', '.dad.', '.day.', '.dds.', '.dhl.', '.diy.', '.dnp.', '.dot.', '.dtv.', '.dvr.', '.eat.', '.esq.', '.fan.', '.fly.', '.foo.', '.fox.', '.ftr.', '.gap.', '.gea.', '.gle.', '.gmo.', '.gmx.', '.goo.', '.got.', '.hbo.', '.how.', '.htc.', '.ice.', '.icu.', '.ifm.', '.ing.', '.itv.', '.iwc.', '.jcb.', '.jcp.', '.jlc.', '.jll.', '.joy.', '.kfh.', '.kia.', '.kpn.', '.lat.', '.lpl.', '.man.', '.mba.', '.mcd.', '.med.', '.meo.', '.mit.', '.mlb.', '.mls.', '.mma.', '.moi.', '.mom.', '.mov.', '.msd.', '.mtn.', '.mtr.', '.nab.', '.nba.', '.nec.', '.new.', '.nfl.', '.nhk.', '.nra.', '.obi.', '.off.', '.ooo.', '.ott.', '.pay.', '.pid.', '.pin.', '.pnc.', '.pru.', '.qvc.', '.ren.', '.ril.', '.rwe.', '.sap.', '.sas.', '.sbi.', '.sbs.', '.sca.', '.ses.', '.sew.', '.sfr.', '.sky.', '.soy.', '.srt.', '.stc.', '.tab.', '.tax.', '.tci.', '.tdk.', '.tjx.', '.trv.', '.tui.', '.tvs.', '.ubs.', '.ups.', '.vig.', '.vin.', '.wed.', '.wme.', '.yun.', '.zip.')):
 		return True
@@ -419,9 +435,23 @@ def generate_meta_from_packet(gmfp_pkt, prefs, dests):
 	"""Creates a dictionary of packet fields that may be needed by other layers."""
 
 	#Default values.  Prefer '' to None so these can be used without having to use str() on everything.
-	meta_dict = {'sMAC': '', 'dMAC': '', 'cast_type': '', 'ip_class': '', 'ttl': '', 'sIP': '', 'dIP': '', 'sport': '', 'dport': '', 'SrcService': '', 'DstService': '', 'SrcClient': '', 'pkt_layers': [], 'flags': 0x0}
+	meta_dict = {
+		'sMAC': '',
+		'dMAC': '',
+		'cast_type': '',
+		'ip_class': '',
+		'ttl': '',
+		'sIP': '',
+		'dIP': '',
+		'sport': '',
+		'dport': '',
+		'SrcService': '',
+		'DstService': '',
+		'SrcClient': '',
+		'flags': 0,
+		'pkt_layers': list(ReturnLayers(gmfp_pkt)),
+	}
 
-	meta_dict['pkt_layers'] = list(ReturnLayers(gmfp_pkt))
 
 	if gmfp_pkt.haslayer(Ether) and isinstance(gmfp_pkt[Ether], Ether):
 		meta_dict['sMAC'] = gmfp_pkt[Ether].src
@@ -508,34 +538,32 @@ def MacDataDict(MacFiles, prefs, dests):
 	for MacFile in MacFiles:
 		if os.path.isfile(MacFile):
 			try:
-				MacHandle = open(MacFile, 'r', errors='ignore')
+				with open(MacFile, 'r', errors='ignore') as MacHandle:
+					for line in MacHandle:
+						if (len(line) >= 8) and (line[2] == ':') and (line[5] == ':'):
+							#uppercase incoming strings just in case one of the files uses lowercase
+							MacHeader = line[:8].upper()
+							Manuf = line[8:].strip()
+							if MacHeader not in tmp_manuf_dict:
+								tmp_manuf_dict[MacHeader] = Manuf
+								LoadCount += 1
+						elif (len(line) >= 7) and (re.search('^[0-9A-F]{6}[ \t]', line) is not None):
+							MacHeader = str.upper(line[:2] + ':' + line[2:4] + ':' + line[4:6])
+							Manuf = line[7:].strip()
+							if MacHeader not in tmp_manuf_dict:
+								tmp_manuf_dict[MacHeader] = Manuf
+								LoadCount += 1
 
-				for line in MacHandle:
-					if (len(line) >= 8) and (line[2] == ':') and (line[5] == ':'):
-						#uppercase incoming strings just in case one of the files uses lowercase
-						MacHeader = line[:8].upper()
-						Manuf = line[8:].strip()
-						if MacHeader not in tmp_manuf_dict:
-							tmp_manuf_dict[MacHeader] = Manuf
-							LoadCount += 1
-					elif (len(line) >= 7) and (re.search('^[0-9A-F]{6}[ \t]', line) is not None):
-						MacHeader = str.upper(line[0:2] + ':' + line[2:4] + ':' + line[4:6])
-						Manuf = line[7:].strip()
-						if MacHeader not in tmp_manuf_dict:
-							tmp_manuf_dict[MacHeader] = Manuf
-							LoadCount += 1
-
-				MacHandle.close()
 				if '00:00:00' in tmp_manuf_dict:
 					del tmp_manuf_dict['00:00:00']		#Not really Xerox
 					LoadCount -= 1
 			except:
-				debug_out("Unable to load " + str(MacFile), prefs, dests)
-		#Silently ignore if it isn't there
-		#else:
-		#	debug_out("Unable to load " + str(MacFile), prefs, dests)
+				debug_out(f"Unable to load {str(MacFile)}", prefs, dests)
+			#Silently ignore if it isn't there
+			#else:
+			#	debug_out("Unable to load " + str(MacFile), prefs, dests)
 
-	debug_out(str(LoadCount) + " mac prefixes loaded.", prefs, dests)
+	debug_out(f"{str(LoadCount)} mac prefixes loaded.", prefs, dests)
 
 	return tmp_manuf_dict
 
@@ -555,150 +583,151 @@ def NmapServiceFPDict(ServiceFileNames, prefs, dests):
 	for ServiceFileName in ServiceFileNames:
 		if os.path.isfile(ServiceFileName):
 			try:
-				ServiceHandle = open(ServiceFileName, "r")
-				for line in ServiceHandle:
-					if (len(line) >= 5) and (line[0:6] == "Probe "):
-						#print "==== PROBE ===="
-						PortArray = []
-						#print len(PortArray), PortArray			#len of empty array is 0
-					elif (len(line) >= 5) and (line[0:6] == "match "):
-						#print "match"
-						#print line
-						InformationPresent = True
-														#Sample line:
-														#  match srun m|^X\0\0\0$| p/Caucho Resin JSP Engine srun/
-						Remainder = line[6:].strip()					#  srun m|^X\0\0\0$| p/Caucho Resin JSP Engine srun/
-						MatchStart = Remainder.find(" m")				#      4
-						ProtoString = Remainder[:MatchStart].replace(',', ';')		#  srun
-						#At the moment, nmap-service-probes uses these separators:
-						#3 m%, 2 m+, 126 m/, 29 m=, 2 m@, and 3509 m|
-						#No flags on %, +,
-						#Only flags should be "i" (case-insensitive) and "s" ("." can match newline)
-						Separator = Remainder[MatchStart+2:MatchStart+3]		#        |
-						MatchEnd = Remainder.find(Separator, MatchStart+3)		#                  16
-						MatchString = Remainder[MatchStart+3:MatchEnd]			#         ^X\0\0\0$
+				with open(ServiceFileName, "r") as ServiceHandle:
+					for line in ServiceHandle:
+						if len(line) >= 5:
+							if line[:6] == "Probe ":
+								#print "==== PROBE ===="
+								PortArray = []
+								#print len(PortArray), PortArray			#len of empty array is 0
+							elif line[:6] == "match ":
+								#print "match"
+								#print line
+								InformationPresent = True
+								Remainder = line[6:].strip()					#  srun m|^X\0\0\0$| p/Caucho Resin JSP Engine srun/
+								MatchStart = Remainder.find(" m")				#      4
+								ProtoString = Remainder[:MatchStart].replace(',', ';')		#  srun
+								#At the moment, nmap-service-probes uses these separators:
+								#3 m%, 2 m+, 126 m/, 29 m=, 2 m@, and 3509 m|
+								#No flags on %, +,
+								#Only flags should be "i" (case-insensitive) and "s" ("." can match newline)
+								Separator = Remainder[MatchStart+2:MatchStart+3]		#        |
+								MatchEnd = Remainder.find(Separator, MatchStart+3)		#                  16
+								MatchString = Remainder[MatchStart+3:MatchEnd]			#         ^X\0\0\0$
 
-						#Handle an "i" or "s" flag after separator
-						#debug_out("==== " + Remainder[MatchEnd+1:MatchEnd+4], prefs, dests)
-						if MatchEnd + 1 == len(Remainder):
-							InformationPresent = False
-							#debug_out("No information data for " + MatchString, prefs, dests)
-						elif Remainder[MatchEnd+1:MatchEnd+2] == " ":
-							PPointer = MatchEnd + 2
-							MatchFlags = re.M
-							#debug_out(Remainder + ", no flags", prefs, dests)
-						elif Remainder[MatchEnd+1:MatchEnd+3] == "i ":
-							PPointer = MatchEnd + 3
-							MatchFlags = re.M | re.I
-							#debug_out(Remainder + ", i flag", prefs, dests)
-						elif Remainder[MatchEnd+1:MatchEnd+3] == "s ":
-							PPointer = MatchEnd + 3
-							MatchFlags = re.M | re.S
-							#debug_out(Remainder + ", s flag", prefs, dests)
-						elif (Remainder[MatchEnd+1:MatchEnd+4] == "is ") or (Remainder[MatchEnd+1:MatchEnd+4] == "si "):
-							PPointer = MatchEnd + 4
-							MatchFlags = re.M | re.I | re.S
-							#debug_out(Remainder + ", i and s flag", prefs, dests)
-						#Following lines commented out as they're only needed for development
-						#else:
-						#	debug_out("Unrecognized nmap-service-probes flag combination", prefs, dests)
-						#	debug_out(str(MatchEnd + 1) + " " + str(len(Remainder)), prefs, dests)
-						#	debug_out(Remainder + ", unknown flags", prefs, dests)
-						#	#quit()
+														#Handle an "i" or "s" flag after separator
+														#debug_out("==== " + Remainder[MatchEnd+1:MatchEnd+4], prefs, dests)
+								if MatchEnd + 1 == len(Remainder):
+									InformationPresent = False
+									#debug_out("No information data for " + MatchString, prefs, dests)
+								elif Remainder[MatchEnd+1:MatchEnd+2] == " ":
+									PPointer = MatchEnd + 2
+									MatchFlags = re.M
+									#debug_out(Remainder + ", no flags", prefs, dests)
+								elif Remainder[MatchEnd+1:MatchEnd+3] == "i ":
+									PPointer = MatchEnd + 3
+									MatchFlags = re.M | re.I
+									#debug_out(Remainder + ", i flag", prefs, dests)
+								elif Remainder[MatchEnd+1:MatchEnd+3] == "s ":
+									PPointer = MatchEnd + 3
+									MatchFlags = re.M | re.S
+									#debug_out(Remainder + ", s flag", prefs, dests)
+								elif Remainder[MatchEnd + 1 : MatchEnd + 4] in ["is ", "si "]:
+									PPointer = MatchEnd + 4
+									MatchFlags = re.M | re.I | re.S
+									#debug_out(Remainder + ", i and s flag", prefs, dests)
+								#Following lines commented out as they're only needed for development
+								#else:
+								#	debug_out("Unrecognized nmap-service-probes flag combination", prefs, dests)
+								#	debug_out(str(MatchEnd + 1) + " " + str(len(Remainder)), prefs, dests)
+								#	debug_out(Remainder + ", unknown flags", prefs, dests)
+								#	#quit()
 
-						#Substitute ; for , in ProtoString and ServerDescription since we're using commas as field delimiters in output
-						ServerDescription = Remainder[PPointer:].replace(',', ';')	#                    p/Caucho Resin JSP Engine srun/
+								#Substitute ; for , in ProtoString and ServerDescription since we're using commas as field delimiters in output
+								ServerDescription = Remainder[PPointer:].replace(',', ';')	#                    p/Caucho Resin JSP Engine srun/
 
-						#The nmap-service-probes file uses a character set ("[...]") issue that python doesn't like.
-						#If a "-" is used inside a character set, it should either be in the first or last position,
-						#or used in a character range ("[.....a-z.....]").  The following move any dashes to first or
-						#last position so re.compile is happy.
-						MatchString = MatchString.replace("[\w-", "[-\w")		#The dash needs to be at the end or it's treated as a range specifier
-						MatchString = MatchString.replace("[\d-", "[-\d")		#same
-						MatchString = MatchString.replace("[\w\d-_.]", "[\w\d_.-]")	#and so on...
-						MatchString = MatchString.replace("[\w\d-_]", "[\w\d_-]")
-						MatchString = MatchString.replace("[.-\w]", "[.\w-]")
-						MatchString = MatchString.replace("[\s-\w.,]", "[\s\w.,-]")
-						MatchString = MatchString.replace("[\w\d-.]", "[\w\d.-]")
-						MatchString = MatchString.replace("[\d\.-\w]", "[\d\.\w-]")
-						MatchString = MatchString.replace("[^-_A-Z0-9]", "[^_A-Z0-9-]")
-						MatchString = MatchString.replace("[^-A-Z0-9]", "[^A-Z0-9-]")
+								#The nmap-service-probes file uses a character set ("[...]") issue that python doesn't like.
+								#If a "-" is used inside a character set, it should either be in the first or last position,
+								#or used in a character range ("[.....a-z.....]").  The following move any dashes to first or
+								#last position so re.compile is happy.
+								MatchString = MatchString.replace("[\w-", "[-\w")		#The dash needs to be at the end or it's treated as a range specifier
+								MatchString = MatchString.replace("[\d-", "[-\d")		#same
+								MatchString = MatchString.replace("[\w\d-_.]", "[\w\d_.-]")	#and so on...
+								MatchString = MatchString.replace("[\w\d-_]", "[\w\d_-]")
+								MatchString = MatchString.replace("[.-\w]", "[.\w-]")
+								MatchString = MatchString.replace("[\s-\w.,]", "[\s\w.,-]")
+								MatchString = MatchString.replace("[\w\d-.]", "[\w\d.-]")
+								MatchString = MatchString.replace("[\d\.-\w]", "[\d\.\w-]")
+								MatchString = MatchString.replace("[^-_A-Z0-9]", "[^_A-Z0-9-]")
+								MatchString = MatchString.replace("[^-A-Z0-9]", "[^A-Z0-9-]")
 
-						#If you get a rule that mismatches, find its "match" line in nmap-service-probes and pull out the "p/..../' signature name.
-						#Copy an "elif..." section below and put the signature name (without "p/" and "/") inside the quotes after .find .
-						if ServerDescription.find('Skype VoIP data channel') > -1:
-							#This "14 bytes of random stuff" signature way misfires.
-							pass
-						elif ServerDescription.find('Microsoft Distributed Transaction Coordinator') > -1:
-							#This "ERROR" signature matches other protocols.
-							pass
-						elif ServerDescription.find('Erlang Distribution Node') > -1:
-							#This signature mismatches.
-							pass
-						elif ServerDescription.find('Lotus Domino Console') > -1:
-							#This signature mismatches.
-							pass
-						elif ServerDescription.find('LANDesk remote management') > -1:
-							#This signature mismatches.
-							pass
-						elif not InformationPresent:
-							#There's a regex match, but no information about, skip.
-							pass
-						else:
-							try:
-								#We try to compile the MatchString now before inserting into tmp_fp_dict so the work only needs to be
-								#done once.  If this fails we fall down to the except and simply don't use the tuple.
-								#Originally 413 out of 3671 match lines failed to compile because of "-" placement in character sets.
-								#The problem, and a fixed version, have been reported to the nmap developers.
-								#The use of "str" seems redundant, but we have occasionally gotten:
-								#line 511: OutputDescription = OneTuple[1]
-								#TypeError: expected a character buffer object
-								SearchTuple = (re.compile(MatchString, MatchFlags), str(ProtoString + "://" + ServerDescription))
-								CompileSuccess += 1
-								if len(PortArray) == 0:
-									#No ports declared yet; we'll place this search pair under the special port "all"
-									if 'all' not in tmp_fp_dict:
-										tmp_fp_dict['all'] = []
-									tmp_fp_dict['all'].append(SearchTuple)
-									LoadCount += 1
-								else:
-									#Register this search pair for every port requested
-									for OnePort in PortArray:
-										if int(OnePort) not in tmp_fp_dict:
-											tmp_fp_dict[int(OnePort)] = []
-										tmp_fp_dict[int(OnePort)].append(SearchTuple)
-										LoadCount += 1
-							except:
-								#print "Failed to compile " + MatchString
-								CompileFail += 1
+														#If you get a rule that mismatches, find its "match" line in nmap-service-probes and pull out the "p/..../' signature name.
+														#Copy an "elif..." section below and put the signature name (without "p/" and "/") inside the quotes after .find .
+								if ServerDescription.find('Skype VoIP data channel') > -1:
+									#This "14 bytes of random stuff" signature way misfires.
+									pass
+								elif ServerDescription.find('Microsoft Distributed Transaction Coordinator') > -1:
+									#This "ERROR" signature matches other protocols.
+									pass
+								elif ServerDescription.find('Erlang Distribution Node') > -1:
+									#This signature mismatches.
+									pass
+								elif ServerDescription.find('Lotus Domino Console') > -1:
+									#This signature mismatches.
+									pass
+								elif ServerDescription.find('LANDesk remote management') > -1:
+									#This signature mismatches.
+									pass
+								elif InformationPresent:
+									try:
+																		#We try to compile the MatchString now before inserting into tmp_fp_dict so the work only needs to be
+																		#done once.  If this fails we fall down to the except and simply don't use the tuple.
+																		#Originally 413 out of 3671 match lines failed to compile because of "-" placement in character sets.
+																		#The problem, and a fixed version, have been reported to the nmap developers.
+																		#The use of "str" seems redundant, but we have occasionally gotten:
+																		#line 511: OutputDescription = OneTuple[1]
+																		#TypeError: expected a character buffer object
+										SearchTuple = re.compile(MatchString, MatchFlags), str(
+											f"{ProtoString}://{ServerDescription}"
+										)
 
-					elif (len(line) >= 5) and (line[0:6] == "ports "):
-						PortArray = []
-						RawPortsString = line[6:].strip()
-						#print "ports are ", RawPortsString
-						for PortBlock in RawPortsString.split(","):		#Each PortBlock is either an individual port or port range
-							if PortBlock.find("-") > -1:
-								#We have a port range
-								PortRange = PortBlock.split("-")
-								for OnePort in range(int(PortRange[0]), int(PortRange[1]) + 1):
-									PortArray.append(OnePort)
-							else:
-								PortArray.append(PortBlock)
-						#print len(PortArray), PortArray
-					elif (len(line) >= 9) and (line[0:10] == "softmatch "):
-						pass
-						#softmatches look very weak at the moment; none give a productname.  Skip for the moment.
-						#print "softmatch"
+										CompileSuccess += 1
+										if len(PortArray) == 0:
+											#No ports declared yet; we'll place this search pair under the special port "all"
+											if 'all' not in tmp_fp_dict:
+												tmp_fp_dict['all'] = []
+											tmp_fp_dict['all'].append(SearchTuple)
+											LoadCount += 1
+										else:
+											#Register this search pair for every port requested
+											for OnePort in PortArray:
+												if int(OnePort) not in tmp_fp_dict:
+													tmp_fp_dict[int(OnePort)] = []
+												tmp_fp_dict[int(OnePort)].append(SearchTuple)
+												LoadCount += 1
+									except:
+										#print "Failed to compile " + MatchString
+										CompileFail += 1
 
-				ServiceHandle.close()
-
+							elif line[:6] == "ports ":
+								PortArray = []
+								RawPortsString = line[6:].strip()
+														#print "ports are ", RawPortsString
+								for PortBlock in RawPortsString.split(","):		#Each PortBlock is either an individual port or port range
+									if PortBlock.find("-") > -1:
+										#We have a port range
+										PortRange = PortBlock.split("-")
+										PortArray.extend(iter(range(int(PortRange[0]), int(PortRange[1]) + 1)))
+									else:
+										PortArray.append(PortBlock)
+													#print len(PortArray), PortArray
 				if CompileFail == 0:
-					debug_out(str(CompileSuccess) + " nmap service signatures successfully loaded.", prefs, dests)
+					debug_out(
+						f"{str(CompileSuccess)} nmap service signatures successfully loaded.",
+						prefs,
+						dests,
+					)
+
 				else:
-					debug_out(str(CompileSuccess) + " nmap service signatures successfully loaded, unable to parse " + str(CompileFail) + " others.", prefs, dests)
+					debug_out(
+						f"{str(CompileSuccess)} nmap service signatures successfully loaded, unable to parse {str(CompileFail)} others.",
+						prefs,
+						dests,
+					)
+
 			except:
-				debug_out("Failed to load " + ServiceFileName, prefs, dests)
-		#No "else:" here as we don't warn on a specific missing source file.  Calling routine complains if none could be loaded.
+				debug_out(f"Failed to load {ServiceFileName}", prefs, dests)
+			#No "else:" here as we don't warn on a specific missing source file.  Calling routine complains if none could be loaded.
 
 	return tmp_fp_dict
 
@@ -767,12 +796,10 @@ def UnhandledPacket(up_packet, prefs, dests):
 def template_extract(p, meta, prefs, dests):
 	"""Pull all statements from the template layer and return as a set of tuples."""
 
-	state_set = set([])
-
 	#if p[template].op == 2:
 	#	state_set.add(("MA", meta['sIP'], "Ethernet", p[template].hwsrc.upper(), "", ()))
 
-	return state_set
+	return set([])
 
 
 def ARP_extract(p, meta, prefs, dests):
@@ -793,8 +820,6 @@ def IP_extract(p, meta, prefs, dests):
 
 	if "OSDescription" not in IP_extract.__dict__:
 		IP_extract.OSDescription = {}		#Dictionary of strings.  Key is the expanded IP address, value is the OS of this system.
-
-	state_set = set([])
 
 	#if p[IP].op == 2:
 	#	state_set.add(("MA", meta['sIP'], "Ethernet", p[IP].hwsrc.upper(), "", ()))
@@ -827,7 +852,7 @@ def IP_extract(p, meta, prefs, dests):
 	#		#	state_set.add(("IP", sIP, "IP", "live", PDescription, ()))
 
 
-	return state_set
+	return set([])
 
 
 def TCP_extract(p, meta, prefs, dests):
